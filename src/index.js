@@ -1,6 +1,6 @@
 // Factory Function for creating todo's
 const model = (() => {
-  let todoList = [
+  let todoList = JSON.parse(localStorage.getItem("todoList")) || [
     {
       title: "walk dog",
       description: "walk missy around the block",
@@ -8,10 +8,15 @@ const model = (() => {
       priority: "urgent",
     },
   ];
-
+  console.log(localStorage.getItem("todoList"));
   const addTodoToList = (todo) => {
     todoList.push(todo);
+    saveListToLocalStorage();
     view.displayTodos();
+  };
+
+  const saveListToLocalStorage = () => {
+    localStorage.setItem("todoList", JSON.stringify(todoList));
   };
 
   return {
