@@ -9,22 +9,14 @@ const model = (() => {
     },
   ];
 
-  const createTodo = (title, description, dueDate, priority) => {
-    addTodoToList({
-      title,
-      description,
-      dueDate,
-      priority,
-    });
-  };
-
   const addTodoToList = (todo) => {
     todoList.push(todo);
+    view.displayTodos();
   };
 
   return {
-    createTodo,
     todoList,
+    addTodoToList,
   };
 })();
 
@@ -34,6 +26,7 @@ const view = (() => {
   mainDiv.appendChild(list);
 
   const displayTodos = () => {
+    list.innerHTML = "";
     model.todoList.map((todo) => {
       const newTodoLi = document.createElement("li");
       newTodoLi.innerHTML = todo.title;
@@ -47,5 +40,16 @@ const view = (() => {
 })();
 
 const controller = (() => {
+  const submitButton = document.getElementById("new-todo-submit");
+  const form = document.getElementById("todo-form");
+  const handleNewTodoSubmit = (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const todo = Object.fromEntries(data.entries());
+    model.addTodoToList(todo);
+    form.reset();
+  };
+  submitButton.addEventListener("click", handleNewTodoSubmit);
+
   view.displayTodos();
 })();
