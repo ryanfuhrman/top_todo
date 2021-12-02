@@ -7,6 +7,33 @@
     <title>Document</title>
   </head>
   <body>
+    <h1>Todo List</h1>
+    <form action="" method="get" class="new-todo-form" id="todo-form">
+      <div class="form-section-div">
+        <label for="title">Title: </label>
+        <input type="text" name="title" id="title" required />
+      </div>
+      <div class="form-section-div">
+        <label for="description">Description: </label>
+        <input type="text" name="description" id="description" required />
+      </div>
+      <div class="form-section-div">
+        <label for="due date">Due Date: </label>
+        <input type="date" name="email" id="email" required />
+      </div>
+      <div class="form-section-div">
+        <label for="priority">Priority: </label>
+        <select name="priority level" id="priority-levels">
+          <option value="">--Please Choose Priority Level--</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div class="form-section-div">
+        <input type="submit" value="Submit" id="new-todo-submit" />
+      </div>
+    </form>
     <div id="content"></div>
     <script src="main.js"></script>
   </body>
