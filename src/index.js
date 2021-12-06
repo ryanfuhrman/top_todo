@@ -1,6 +1,7 @@
 // Factory Function for creating todo's
 const model = (() => {
-  let todoList = JSON.parse(localStorage.getItem("todoList")) || [
+  let masterList = JSON.parse(localStorage.getItem("masterList")) || [];
+  let testList = JSON.parse(localStorage.getItem("testList")) || [
     {
       title: "walk dog",
       description: "walk missy around the block",
@@ -8,19 +9,22 @@ const model = (() => {
       priority: "urgent",
     },
   ];
-  console.log(localStorage.getItem("todoList"));
+
   const addTodoToList = (todo) => {
-    todoList.push(todo);
+    masterList.push(todo);
     saveListToLocalStorage();
-    view.displayTodos();
+    view.displayTodos(masterList);
   };
 
+  const deleteTodo = (todo) => {};
+
   const saveListToLocalStorage = () => {
-    localStorage.setItem("todoList", JSON.stringify(todoList));
+    localStorage.setItem("masterList", JSON.stringify(masterList));
   };
 
   return {
-    todoList,
+    masterList,
+    testList,
     addTodoToList,
   };
 })();
@@ -30,11 +34,19 @@ const view = (() => {
   const list = document.createElement("ul");
   mainDiv.appendChild(list);
 
-  const displayTodos = () => {
+  const addDeleteButton = (element) => {
+    const deleteTodoButton = document.createElement("button");
+    deleteTodoButton.innerHTML = "X";
+    element.appendChild(deleteTodoButton);
+  };
+
+  const displayTodos = (todoList) => {
     list.innerHTML = "";
-    model.todoList.map((todo) => {
+    todoList.map((todo) => {
       const newTodoLi = document.createElement("li");
-      newTodoLi.innerHTML = todo.title;
+      const todoDiv = newTodoLi.appendChild(document.createElement("div"));
+      addDeleteButton(newTodoLi);
+      todoDiv.innerHTML = todo.title;
       list.appendChild(newTodoLi);
     });
   };
@@ -47,14 +59,25 @@ const view = (() => {
 const controller = (() => {
   const submitButton = document.getElementById("new-todo-submit");
   const form = document.getElementById("todo-form");
-  const handleNewTodoSubmit = (event) => {
+
+  const handleSubmitTodo = (event) => {
     event.preventDefault();
     const data = new FormData(form);
     const todo = Object.fromEntries(data.entries());
     model.addTodoToList(todo);
     form.reset();
   };
-  submitButton.addEventListener("click", handleNewTodoSubmit);
 
-  view.displayTodos();
+  const handleDeleteTodo = (e) => {
+    console.log(e);
+  };
+
+  submitButton.addEventListener("click", handleSubmitTodo);
+  // deleteButton.addEventListener("click", handleDeleteTodo);
+
+  view.displayTodos(model.masterList);
+
+  return {
+    handleDeleteTodo,
+  };
 })();
