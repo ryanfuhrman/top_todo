@@ -6,6 +6,7 @@ const model = (() => {
       description: "walk missy around the block",
       dueDate: "today",
       priority: "urgent",
+      project: "random",
     },
   ];
   console.log(localStorage.getItem("todoList"));
