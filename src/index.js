@@ -4,15 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 const model = (() => {
   let masterList = JSON.parse(localStorage.getItem("masterList")) || [];
 
-  let testList = JSON.parse(localStorage.getItem("testList")) || [
-    {
-      title: "walk dog",
-      description: "walk missy around the block",
-      dueDate: "today",
-      priority: "urgent",
-    },
-  ];
-
   const addTodoToList = (todo) => {
     masterList.push(todo);
     saveListToLocalStorage();
