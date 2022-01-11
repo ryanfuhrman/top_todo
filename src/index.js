@@ -1,14 +1,8 @@
+import { v4 as uuidv4 } from "uuid";
+
 // Factory Function for creating todo's
 const model = (() => {
   let masterList = JSON.parse(localStorage.getItem("masterList")) || [];
-  let testList = JSON.parse(localStorage.getItem("testList")) || [
-    {
-      title: "walk dog",
-      description: "walk missy around the block",
-      dueDate: "today",
-      priority: "urgent",
-    },
-  ];
 
   const addTodoToList = (todo) => {
     masterList.push(todo);
@@ -16,7 +10,14 @@ const model = (() => {
     view.displayTodos(masterList);
   };
 
-  const deleteTodo = (todo) => {};
+  const deleteTodo = (id) => {
+    const mutableArray = [...masterList];
+    const newArray = mutableArray.filter((todo) => todo.id != id);
+    console.log(newArray);
+    masterList = newArray;
+    saveListToLocalStorage();
+    view.displayTodos(masterList);
+  };
 
   const saveListToLocalStorage = () => {
     localStorage.setItem("masterList", JSON.stringify(masterList));
@@ -24,8 +25,8 @@ const model = (() => {
 
   return {
     masterList,
-    testList,
     addTodoToList,
+    deleteTodo,
   };
 })();
 
@@ -36,6 +37,7 @@ const view = (() => {
 
   const addDeleteButton = (element) => {
     const deleteTodoButton = document.createElement("button");
+    deleteTodoButton.classList.add("delete-todo-btn");
     deleteTodoButton.innerHTML = "X";
     element.appendChild(deleteTodoButton);
   };
@@ -45,6 +47,7 @@ const view = (() => {
     todoList.map((todo) => {
       const newTodoLi = document.createElement("li");
       const todoDiv = newTodoLi.appendChild(document.createElement("div"));
+      newTodoLi.id = todo.id;
       addDeleteButton(newTodoLi);
       todoDiv.innerHTML = todo.title;
       list.appendChild(newTodoLi);
@@ -60,22 +63,27 @@ const controller = (() => {
   const submitButton = document.getElementById("new-todo-submit");
   const form = document.getElementById("todo-form");
 
+  // Render Todos to Page
+  view.displayTodos(model.masterList);
+
   const handleSubmitTodo = (event) => {
     event.preventDefault();
     const data = new FormData(form);
     const todo = Object.fromEntries(data.entries());
+    todo.id = uuidv4();
+    console.log(todo);
     model.addTodoToList(todo);
     form.reset();
   };
 
-  const handleDeleteTodo = (e) => {
-    console.log(e);
-  };
+  const handleDeleteTodo = (e) => model.deleteTodo(e.target.parentElement.id);
 
   submitButton.addEventListener("click", handleSubmitTodo);
-  // deleteButton.addEventListener("click", handleDeleteTodo);
+  const deleteButton = document.querySelectorAll(".delete-todo-btn");
 
-  view.displayTodos(model.masterList);
+  deleteButton.forEach((btn) =>
+    btn.addEventListener("click", handleDeleteTodo)
+  );
 
   return {
     handleDeleteTodo,
