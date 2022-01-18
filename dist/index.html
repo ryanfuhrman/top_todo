@@ -32,13 +32,12 @@
       </div>
       <div class="form-section-div">
         <label for="list">List: </label>
-        <select name="priority level" id="priority-levels">
-          <option value="">--Please Choose a List--</option>
-          <option value="random">Random</option>
-          <option value="grocery-list">Grocery List</option>
-          <option value="goals">Goals</option>
-          <option value="new">New List</option>
-        </select>
+        <input list="todolists-list" placeholder="Add todo to a list" />
+        <datalist name="todo lists" id="todolists-list">
+          <option value="random"></option>
+          <option value="grocery-list"></option>
+          <option value="goals"></option>
+        </datalist>
       </div>
       <div class="form-section-div">
         <input type="submit" value="Submit" id="new-todo-submit" />
