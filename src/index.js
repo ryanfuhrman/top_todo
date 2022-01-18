@@ -11,8 +11,8 @@ const model = (() => {
   };
 
   const deleteTodo = (id) => {
-    const mutableArray = [...masterList];
-    const newArray = mutableArray.filter((todo) => todo.id != id);
+    const mutatableArray = [...masterList];
+    const newArray = mutatableArray.filter((todo) => todo.id != id);
     console.log(newArray);
     masterList = newArray;
     saveListToLocalStorage();
