@@ -7,33 +7,47 @@ const model = (() => {
   const addTodoToList = (todo) => {
     masterList.push(todo);
     saveListToLocalStorage();
-    view.displayTodos(masterList);
+    view.displayAllTodos(masterList);
   };
 
   const deleteTodo = (id) => {
     const mutatableArray = [...masterList];
     const newArray = mutatableArray.filter((todo) => todo.id != id);
-    console.log(newArray);
     masterList = newArray;
     saveListToLocalStorage();
-    view.displayTodos(masterList);
+    view.displayAllTodos(masterList);
   };
 
   const saveListToLocalStorage = () => {
     localStorage.setItem("masterList", JSON.stringify(masterList));
   };
 
+  const getProjectNames = () => {
+    const projectNames = [];
+    model.masterList.map((todo) => {
+      projectNames.push(todo.listName);
+    });
+    return projectNames;
+  };
+
   return {
     masterList,
     addTodoToList,
     deleteTodo,
+    getProjectNames,
   };
 })();
 
 const view = (() => {
   const mainDiv = document.getElementById("content");
-  const list = document.createElement("ul");
-  mainDiv.appendChild(list);
+
+  const projectListUl = document.createElement("ul");
+  projectListUl.classList.add = "project-list-ul";
+  mainDiv.appendChild(projectListUl);
+
+  const todoList = document.createElement("ul");
+  todoList.classList.add("todo-list-ul");
+  mainDiv.appendChild(todoList);
 
   const addDeleteButton = (element) => {
     const deleteTodoButton = document.createElement("button");
@@ -42,20 +56,35 @@ const view = (() => {
     element.appendChild(deleteTodoButton);
   };
 
-  const displayTodos = (todoList) => {
-    list.innerHTML = "";
-    todoList.map((todo) => {
+  const displayProjectNames = () => {
+    projectListUl.innerHTML = "";
+    const projectNames = model.getProjectNames();
+    projectNames.forEach((name) => {
+      const projectNameLi = document.createElement("li");
+      projectNameLi.innerHTML = name;
+      projectNameLi.classList.add("project-name-li");
+      projectListUl.appendChild(projectNameLi);
+    });
+  };
+
+  const displayAllTodos = (list) => {
+    todoList.innerHTML = "";
+    list.map((todo) => {
       const newTodoLi = document.createElement("li");
       const todoDiv = newTodoLi.appendChild(document.createElement("div"));
       newTodoLi.id = todo.id;
       addDeleteButton(newTodoLi);
       todoDiv.innerHTML = todo.title;
-      list.appendChild(newTodoLi);
+      todoList.appendChild(newTodoLi);
     });
+    displayProjectNames();
   };
 
+  const displayTodosByProject = (project) => {};
+
   return {
-    displayTodos,
+    displayAllTodos,
+    displayProjectNames,
   };
 })();
 
@@ -64,21 +93,30 @@ const controller = (() => {
   const form = document.getElementById("todo-form");
 
   // Render Todos to Page
-  view.displayTodos(model.masterList);
+  view.displayAllTodos(model.masterList);
+
+  const projectListNames = document.querySelectorAll(".project-name-li");
 
   const handleSubmitTodo = (event) => {
     event.preventDefault();
     const data = new FormData(form);
     const todo = Object.fromEntries(data.entries());
     todo.id = uuidv4();
-    console.log(todo);
     model.addTodoToList(todo);
     form.reset();
   };
 
-  const handleDeleteTodo = (e) => model.deleteTodo(e.target.parentElement.id);
+  const handleDisplayList = (event) => {
+    console.log(event.target.innerHTML);
+  };
 
+  projectListNames.forEach((project) => {
+    project.addEventListener("click", handleDisplayList);
+  });
+
+  const handleDeleteTodo = (e) => model.deleteTodo(e.target.parentElement.id);
   submitButton.addEventListener("click", handleSubmitTodo);
+
   const deleteButton = document.querySelectorAll(".delete-todo-btn");
 
   deleteButton.forEach((btn) =>

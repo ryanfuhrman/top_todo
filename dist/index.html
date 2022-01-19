@@ -19,7 +19,7 @@
       </div>
       <div class="form-section-div">
         <label for="due date">Due Date: </label>
-        <input type="date" name="email" id="email" required />
+        <input type="date" name="due date" id="dueDate" required />
       </div>
       <div class="form-section-div">
         <label for="priority">Priority: </label>
@@ -31,9 +31,13 @@
         </select>
       </div>
       <div class="form-section-div">
-        <label for="list">List: </label>
-        <input list="todolists-list" placeholder="Add todo to a list" />
-        <datalist name="todo lists" id="todolists-list">
+        <label for="listName">List: </label>
+        <input
+          name="listName"
+          list="list-names"
+          placeholder="Add todo to a list"
+        />
+        <datalist name="todo lists" id="list-names">
           <option value="random"></option>
           <option value="grocery-list"></option>
           <option value="goals"></option>
