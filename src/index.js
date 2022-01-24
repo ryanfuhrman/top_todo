@@ -23,14 +23,11 @@ const model = (() => {
   };
 
   const getProjectNames = () => {
-    const projectNames = [];
+    const projectNames = ["all"];
     model.masterList.map((todo) => {
       projectNames.push(todo.listName);
     });
-    const listWithDuplicateNames = [...model.masterList].map(
-      (project) => project.listName
-    );
-    const cleanedUpList = [...new Set(listWithDuplicateNames)];
+    const cleanedUpList = [...new Set(projectNames)];
     return cleanedUpList;
   };
 
@@ -79,11 +76,14 @@ const view = (() => {
 
   const displayTodosByProject = (project) => {
     todoList.innerHTML = "";
+    let filteredTodos = "";
     const allTodos = [...model.masterList];
-    const todosMatchingProjectName = allTodos.filter(
-      (todo) => todo.listName === project
-    );
-    displayTodos(todosMatchingProjectName);
+    if (project != "all") {
+      filteredTodos = allTodos.filter((todo) => todo.listName === project);
+    } else {
+      filteredTodos = allTodos;
+    }
+    displayTodos(filteredTodos);
   };
 
   return {
