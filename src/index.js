@@ -11,8 +11,8 @@ const model = (() => {
   };
 
   const deleteTodo = (id) => {
-    const mutatableArray = [...masterList];
-    const newArray = mutatableArray.filter((todo) => todo.id != id);
+    const list = JSON.parse(localStorage.getItem("masterList"));
+    const newArray = list.filter((todo) => todo.id != id);
     masterList = newArray;
     saveListToLocalStorage();
     view.displayTodos(masterList);
@@ -24,7 +24,9 @@ const model = (() => {
 
   const getProjectNames = () => {
     const projectNames = ["all"];
-    model.masterList.map((todo) => {
+    const currentList = localStorage.getItem("masterList");
+    const readableList = JSON.parse(currentList);
+    readableList.map((todo) => {
       projectNames.push(todo.listName);
     });
     const cleanedUpList = [...new Set(projectNames)];
@@ -77,7 +79,7 @@ const view = (() => {
   const displayTodosByProject = (project) => {
     todoList.innerHTML = "";
     let filteredTodos = "";
-    const allTodos = [...model.masterList];
+    const allTodos = JSON.parse(localStorage.getItem("masterList"));
     if (project != "all") {
       filteredTodos = allTodos.filter((todo) => todo.listName === project);
     } else {
@@ -97,11 +99,6 @@ const controller = (() => {
   const submitButton = document.getElementById("new-todo-submit");
   const form = document.getElementById("todo-form");
 
-  // Render Todos to Page
-  view.displayTodos(model.masterList);
-
-  const projectListNames = document.querySelectorAll(".project-name-li");
-
   const handleSubmitTodo = (event) => {
     event.preventDefault();
     const data = new FormData(form);
@@ -109,15 +106,13 @@ const controller = (() => {
     todo.id = uuidv4();
     model.addTodoToList(todo);
     form.reset();
+    handleDisplayProjectNames();
+    applyEventListeners();
   };
 
-  const handleDisplayList = (event) => {
+  const handleDisplayListByProject = (event) => {
     const projectName = event.target.innerHTML;
     view.displayTodosByProject(projectName);
-  };
-
-  const handleDeleteTodo = (e) => {
-    model.deleteTodo(e.target.parentElement.id);
   };
 
   const handleDisplayProjectNames = () => {
@@ -127,28 +122,28 @@ const controller = (() => {
       const projectNameLi = document.createElement("li");
       projectNameLi.innerHTML = name;
       projectNameLi.classList.add("project-name-li");
-      projectNameLi.addEventListener("click", handleDisplayList);
+      projectNameLi.addEventListener("click", handleDisplayListByProject);
       projectNameListItems.push(projectNameLi);
     });
     view.displayProjectNames(projectNameListItems);
   };
 
-  const deleteButton = document.querySelectorAll(".delete-todo-btn");
+  const handleDeleteTodo = (e) => {
+    console.log("this fired");
+    model.deleteTodo(e.target.parentElement.id);
+    applyEventListeners();
+  };
 
   const applyEventListeners = () => {
-    // projectListNames.forEach((project) => {
-    //   project.addEventListener("click", handleDisplayList);
-    // });
     submitButton.addEventListener("click", handleSubmitTodo);
-    deleteButton.forEach((btn) =>
-      btn.addEventListener("click", handleDeleteTodo)
-    );
+    const deleteButton = document.querySelectorAll(".delete-todo-btn");
+    deleteButton.forEach((btn) => {
+      btn.addEventListener("click", handleDeleteTodo);
+    });
   };
 
+  // Render Todos to Page
+  view.displayTodos(JSON.parse(localStorage.getItem("masterList")));
   applyEventListeners();
   handleDisplayProjectNames();
-
-  return {
-    applyEventListeners,
-  };
 })();
