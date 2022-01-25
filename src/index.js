@@ -129,7 +129,6 @@ const controller = (() => {
   };
 
   const handleDeleteTodo = (e) => {
-    console.log("this fired");
     model.deleteTodo(e.target.parentElement.id);
     applyEventListeners();
   };
