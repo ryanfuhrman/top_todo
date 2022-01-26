@@ -10,12 +10,14 @@ const model = (() => {
     view.displayTodos(masterList);
   };
 
-  const deleteTodo = (id) => {
+  const deleteTodo = (id, resetProjectNameList) => {
     const list = JSON.parse(localStorage.getItem("masterList"));
     const newArray = list.filter((todo) => todo.id != id);
     masterList = newArray;
     saveListToLocalStorage();
     view.displayTodos(masterList);
+    //
+    resetProjectNameList();
   };
 
   const saveListToLocalStorage = () => {
@@ -27,7 +29,7 @@ const model = (() => {
     const currentList = localStorage.getItem("masterList");
     const readableList = JSON.parse(currentList);
     readableList.map((todo) => {
-      projectNames.push(todo.listName);
+      projectNames.push(todo.projectName);
     });
     const cleanedUpList = [...new Set(projectNames)];
     return cleanedUpList;
@@ -81,7 +83,7 @@ const view = (() => {
     let filteredTodos = "";
     const allTodos = JSON.parse(localStorage.getItem("masterList"));
     if (project != "all") {
-      filteredTodos = allTodos.filter((todo) => todo.listName === project);
+      filteredTodos = allTodos.filter((todo) => todo.projectName === project);
     } else {
       filteredTodos = allTodos;
     }
@@ -113,6 +115,7 @@ const controller = (() => {
   const handleDisplayListByProject = (event) => {
     const projectName = event.target.innerHTML;
     view.displayTodosByProject(projectName);
+    applyEventListeners();
   };
 
   const handleDisplayProjectNames = () => {
@@ -129,9 +132,9 @@ const controller = (() => {
   };
 
   const handleDeleteTodo = (e) => {
-    console.log("this fired");
-    model.deleteTodo(e.target.parentElement.id);
+    model.deleteTodo(e.target.parentElement.id, handleDisplayProjectNames);
     applyEventListeners();
+    handleDisplayProjectNames();
   };
 
   const applyEventListeners = () => {

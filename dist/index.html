@@ -31,17 +31,13 @@
         </select>
       </div>
       <div class="form-section-div">
-        <label for="listName">List: </label>
+        <label for="projectName">List: </label>
         <input
-          name="listName"
-          list="list-names"
-          placeholder="Add todo to a list"
+          name="projectName"
+          list="project-names"
+          placeholder="Add todo to a project"
         />
-        <datalist name="todo lists" id="list-names">
-          <option value="random"></option>
-          <option value="grocery-list"></option>
-          <option value="goals"></option>
-        </datalist>
+        <datalist name="todo projects" id="project-names"> </datalist>
       </div>
       <div class="form-section-div">
         <input type="submit" value="Submit" id="new-todo-submit" />
