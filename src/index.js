@@ -20,6 +20,11 @@ const model = (() => {
     resetProjectNameList();
   };
 
+  const updateTodo = (id) => {
+    const list = JSON.parse(localStorage.getItem("masterList"));
+    const todoToEdit = list.filter((todo) => todo.id === id);
+  };
+
   const saveListToLocalStorage = () => {
     localStorage.setItem("masterList", JSON.stringify(masterList));
   };
@@ -61,6 +66,20 @@ const view = (() => {
     element.appendChild(deleteTodoButton);
   };
 
+  const addMoreInfoButton = (element) => {
+    const moreInfoButton = document.createElement("button");
+    moreInfoButton.classList.add("more-info-btn");
+    moreInfoButton.innerHTML = "More Info";
+    element.appendChild(moreInfoButton);
+  };
+
+  const addEditButton = (element) => {
+    const editTodoButton = document.createElement("button");
+    editTodoButton.classList.add("edit-todo-btn");
+    editTodoButton.innerHTML = "Edit";
+    element.appendChild(editTodoButton);
+  };
+
   const displayProjectNames = (list) => {
     projectListUl.innerHTML = "";
     list.map((li) => projectListUl.appendChild(li));
@@ -70,8 +89,11 @@ const view = (() => {
     todoList.innerHTML = "";
     list.map((todo) => {
       const newTodoLi = document.createElement("li");
-      const todoDiv = newTodoLi.appendChild(document.createElement("div"));
+      const todoDiv = document.createElement("div");
+      todoDiv.classList.add("todo-div");
+      newTodoLi.appendChild(todoDiv);
       newTodoLi.id = todo.id;
+      addMoreInfoButton(newTodoLi);
       addDeleteButton(newTodoLi);
       todoDiv.innerHTML = todo.title;
       todoList.appendChild(newTodoLi);
@@ -137,12 +159,32 @@ const controller = (() => {
     handleDisplayProjectNames();
   };
 
+  const handleMoreInfo = (e) => {
+    console.log(e.target.parentElement.children[0]);
+    const todoDiv = e.target.parentElement.children[0];
+    // const form =
+  };
+
+  const handleEditTodo = (e) => {
+    // model.updateTodo(e.target.parentElement.id);
+    console.log(e.target);
+    applyEventListeners();
+  };
+
   const applyEventListeners = () => {
     submitButton.addEventListener("click", handleSubmitTodo);
     const deleteButton = document.querySelectorAll(".delete-todo-btn");
+    const moreInfoButton = document.querySelectorAll(".more-info-btn");
+    // const editButton = document.querySelectorAll(".edit-todo-btn");
     deleteButton.forEach((btn) => {
       btn.addEventListener("click", handleDeleteTodo);
     });
+    moreInfoButton.forEach((btn) => {
+      btn.addEventListener("click", handleMoreInfo);
+    });
+    // editButton.forEach((btn) => {
+    //   btn.addEventListener("click", handleEditTodo);
+    // });
   };
 
   // Render Todos to Page
