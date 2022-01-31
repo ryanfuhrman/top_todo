@@ -114,10 +114,31 @@ const view = (() => {
     displayTodos(filteredTodos);
   };
 
+  const displayMoreInfo = (id, li) => {
+    const list = JSON.parse(localStorage.getItem("masterList"));
+    const todoSelected = list.filter((todo) => todo.id === id);
+    console.log(todoSelected[0]);
+    li.classList.add("display-more-info");
+    const descriptionDiv = document.createElement("div");
+    descriptionDiv.innerHTML = todoSelected[0].description;
+    const dueDateDiv = document.createElement("div");
+    dueDateDiv.innerHTML = todoSelected[0].dueDate;
+    const priorityLevelDiv = document.createElement("div");
+    priorityLevelDiv.innerHTML = todoSelected[0].priorityLevel;
+    const projectNameDiv = document.createElement("div");
+    projectNameDiv.innerHTML = todoSelected[0].projectName;
+
+    li.appendChild(descriptionDiv);
+    li.appendChild(dueDateDiv);
+    li.appendChild(priorityLevelDiv);
+    li.appendChild(projectNameDiv);
+  };
+
   return {
     displayTodos,
     displayProjectNames,
     displayTodosByProject,
+    displayMoreInfo,
   };
 })();
 
@@ -162,8 +183,11 @@ const controller = (() => {
   };
 
   const handleMoreInfo = (e) => {
-    console.log(e.target.parentElement.children[0]);
+    const li = e.target.parentElement;
+    const id = e.target.parentElement.id;
     const todoDiv = e.target.parentElement.children[0];
+    // console.log(id);
+    view.displayMoreInfo(id, li);
     // const form =
   };
 
