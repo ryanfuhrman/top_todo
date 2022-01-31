@@ -2,7 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 
 // Factory Function for creating todo's
 const model = (() => {
-  let masterList = JSON.parse(localStorage.getItem("masterList")) || [];
+  let masterList =
+    JSON.parse(localStorage.getItem("masterList")) ||
+    localStorage.setItem("masterList", "[]");
 
   const addTodoToList = (todo) => {
     masterList.push(todo);
