@@ -42,11 +42,19 @@ const model = (() => {
     return cleanedUpList;
   };
 
+  const createEditButton = () => {
+    const editButton = document.createElement("button");
+    editButton.innerHTML = "Edit";
+    editButton.classList.add("edit-todo");
+    return editButton;
+  };
+
   return {
     masterList,
     addTodoToList,
     deleteTodo,
     getProjectNames,
+    createEditButton,
   };
 })();
 
@@ -127,11 +135,13 @@ const view = (() => {
     priorityLevelDiv.innerHTML = todoSelected[0].priorityLevel;
     const projectNameDiv = document.createElement("div");
     projectNameDiv.innerHTML = todoSelected[0].projectName;
+    const editButton = model.createEditButton();
 
     li.appendChild(descriptionDiv);
     li.appendChild(dueDateDiv);
     li.appendChild(priorityLevelDiv);
     li.appendChild(projectNameDiv);
+    li.appendChild(editButton);
   };
 
   return {
@@ -186,9 +196,7 @@ const controller = (() => {
     const li = e.target.parentElement;
     const id = e.target.parentElement.id;
     const todoDiv = e.target.parentElement.children[0];
-    // console.log(id);
     view.displayMoreInfo(id, li);
-    // const form =
   };
 
   const handleEditTodo = (e) => {
