@@ -6,6 +6,12 @@ const model = (() => {
     JSON.parse(localStorage.getItem("masterList")) ||
     localStorage.setItem("masterList", "[]");
 
+  const getTodo = (id) => {
+    const list = JSON.parse(localStorage.getItem("masterList"));
+    const todo = list.filter((todo) => todo.id === id);
+    return todo;
+  };
+
   const addTodoToList = (todo) => {
     masterList.push(todo);
     saveListToLocalStorage();
@@ -23,8 +29,8 @@ const model = (() => {
   };
 
   const updateTodo = (id) => {
-    const list = JSON.parse(localStorage.getItem("masterList"));
-    const todoToEdit = list.filter((todo) => todo.id === id);
+    // const list = JSON.parse(localStorage.getItem("masterList"));
+    // const todoToEdit = list.filter((todo) => todo.id === id);
   };
 
   const saveListToLocalStorage = () => {
@@ -45,12 +51,13 @@ const model = (() => {
   const createEditButton = () => {
     const editButton = document.createElement("button");
     editButton.innerHTML = "Edit";
-    editButton.classList.add("edit-todo");
+    editButton.classList.add("edit-todo-btn");
     return editButton;
   };
 
   return {
     masterList,
+    getTodo,
     addTodoToList,
     deleteTodo,
     getProjectNames,
@@ -90,6 +97,53 @@ const view = (() => {
     element.appendChild(editTodoButton);
   };
 
+  const editableTodo = (todo, id) => {
+    const todoToEdit = model.getTodo(id)[0];
+
+    const { title, description, dueDate, priorityLevel, projectName } =
+      todoToEdit;
+
+    const editTodoFormHTML = `<div class="edit-todo-form-div">
+      <form action="" method="get" class="edit-todo-form" id="edit-todo-form">
+        <div class="edit-form-section-div">
+          <label for="title">Title: </label>
+          <input type="text" name="title" id="title" value="${title}" required />
+        </div>
+        <div class="edit-form-section-div">
+          <label for="description">Description: </label>
+          <input type="text" name="description" id="description" value="${description}" required />
+        </div>
+        <div class="edit-form-section-div">
+          <label for="dueDate">Due Date: </label>
+          <input type="date" name="dueDate" id="dueDate" value="${dueDate}" required />
+        </div>
+        <div class="edit-form-section-div">
+          <label for="priority">Priority: </label>
+          <select name="priorityLevel" id="priority-levels">
+            <option value="${priorityLevel}">${priorityLevel}</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="edit-form-section-div">
+          <label for="projectName">List: </label>
+          <input
+            name="projectName"
+            list="project-names"
+            value="${projectName}"
+          />
+          <datalist name="todo projects" id="project-names"> </datalist>
+        </div>
+        <div class="edit-form-section-div">
+          <input type="submit" value="Update" id="new-todo-submit" />
+        </div>
+      </div>`;
+
+    todo.innerHTML = "";
+    todo.innerHTML = editTodoFormHTML;
+  };
+
   const displayProjectNames = (list) => {
     projectListUl.innerHTML = "";
     list.map((li) => projectListUl.appendChild(li));
@@ -125,7 +179,6 @@ const view = (() => {
   const displayMoreInfo = (id, li) => {
     const list = JSON.parse(localStorage.getItem("masterList"));
     const todoSelected = list.filter((todo) => todo.id === id);
-    console.log(todoSelected[0]);
     li.classList.add("display-more-info");
     const descriptionDiv = document.createElement("div");
     descriptionDiv.innerHTML = todoSelected[0].description;
@@ -149,6 +202,7 @@ const view = (() => {
     displayProjectNames,
     displayTodosByProject,
     displayMoreInfo,
+    editableTodo,
   };
 })();
 
@@ -197,11 +251,14 @@ const controller = (() => {
     const id = e.target.parentElement.id;
     const todoDiv = e.target.parentElement.children[0];
     view.displayMoreInfo(id, li);
+    const editInfoButton = document.querySelector(".edit-todo-btn");
+    editInfoButton.addEventListener("click", handleEditTodo);
+    applyEventListeners();
   };
 
   const handleEditTodo = (e) => {
-    // model.updateTodo(e.target.parentElement.id);
-    console.log(e.target);
+    const todo = e.target.parentElement;
+    view.editableTodo(todo, todo.id);
     applyEventListeners();
   };
 
@@ -209,16 +266,13 @@ const controller = (() => {
     submitButton.addEventListener("click", handleSubmitTodo);
     const deleteButton = document.querySelectorAll(".delete-todo-btn");
     const moreInfoButton = document.querySelectorAll(".more-info-btn");
-    // const editButton = document.querySelectorAll(".edit-todo-btn");
     deleteButton.forEach((btn) => {
       btn.addEventListener("click", handleDeleteTodo);
     });
     moreInfoButton.forEach((btn) => {
       btn.addEventListener("click", handleMoreInfo);
     });
-    // editButton.forEach((btn) => {
-    //   btn.addEventListener("click", handleEditTodo);
-    // });
+    submitButton.addEventListener("click", handleSubmitTodo);
   };
 
   // Render Todos to Page
