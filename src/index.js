@@ -13,28 +13,29 @@ const model = (() => {
   };
 
   const addTodoToList = (todo) => {
-    masterList.push(todo);
-    saveListToLocalStorage();
-    view.displayTodos(masterList);
+    const list = JSON.parse(localStorage.getItem("masterList"));
+    list.push(todo);
+    console.log(list);
+    saveListToLocalStorage(list);
+    view.displayTodos();
   };
 
   const deleteTodo = (id, resetProjectNameList) => {
-    const list = JSON.parse(localStorage.getItem("masterList"));
+    C;
     const newArray = list.filter((todo) => todo.id != id);
-    masterList = newArray;
-    saveListToLocalStorage();
-    view.displayTodos(masterList);
-    //
+    saveListToLocalStorage(newArray);
+    view.displayTodos();
     resetProjectNameList();
   };
 
-  const updateTodo = (id) => {
-    // const list = JSON.parse(localStorage.getItem("masterList"));
-    // const todoToEdit = list.filter((todo) => todo.id === id);
+  const updateTodo = (updatedTodo, id) => {
+    const list = JSON.parse(localStorage.getItem("masterList"));
+    let indexOfTodo = list.findIndex((todo) => todo.id === id);
+    console.log(list[indexOfTodo]);
   };
 
-  const saveListToLocalStorage = () => {
-    localStorage.setItem("masterList", JSON.stringify(masterList));
+  const saveListToLocalStorage = (list) => {
+    localStorage.setItem("masterList", JSON.stringify(list));
   };
 
   const getProjectNames = () => {
@@ -62,6 +63,7 @@ const model = (() => {
     deleteTodo,
     getProjectNames,
     createEditButton,
+    updateTodo,
   };
 })();
 
@@ -136,9 +138,10 @@ const view = (() => {
           <datalist name="todo projects" id="project-names"> </datalist>
         </div>
         <div class="edit-form-section-div">
-          <input type="submit" value="Update" id="new-todo-submit" />
+          <input type="submit" value="Update" id="update-todo-submit" />
         </div>
-      </div>`;
+      </form>
+    </div>`;
 
     todo.innerHTML = "";
     todo.innerHTML = editTodoFormHTML;
@@ -149,7 +152,9 @@ const view = (() => {
     list.map((li) => projectListUl.appendChild(li));
   };
 
-  const displayTodos = (list) => {
+  const displayTodos = (
+    list = JSON.parse(localStorage.getItem("masterList"))
+  ) => {
     todoList.innerHTML = "";
     list.map((todo) => {
       const newTodoLi = document.createElement("li");
@@ -208,10 +213,10 @@ const view = (() => {
 
 const controller = (() => {
   const submitButton = document.getElementById("new-todo-submit");
-  const form = document.getElementById("todo-form");
 
   const handleSubmitTodo = (event) => {
     event.preventDefault();
+    const form = document.getElementById("todo-form");
     const data = new FormData(form);
     const todo = Object.fromEntries(data.entries());
     todo.id = uuidv4();
@@ -248,8 +253,7 @@ const controller = (() => {
 
   const handleMoreInfo = (e) => {
     const li = e.target.parentElement;
-    const id = e.target.parentElement.id;
-    const todoDiv = e.target.parentElement.children[0];
+    const id = li.id;
     view.displayMoreInfo(id, li);
     const editInfoButton = document.querySelector(".edit-todo-btn");
     editInfoButton.addEventListener("click", handleEditTodo);
@@ -258,8 +262,21 @@ const controller = (() => {
 
   const handleEditTodo = (e) => {
     const todo = e.target.parentElement;
-    view.editableTodo(todo, todo.id);
+    const id = todo.id;
+    view.editableTodo(todo, id);
+    const updateTodoButton = document.querySelector("#update-todo-submit");
+    updateTodoButton.addEventListener("click", (e) => {
+      handleUpdateTodo(e, id);
+    });
     applyEventListeners();
+  };
+
+  const handleUpdateTodo = (event, id) => {
+    event.preventDefault();
+    const form = document.getElementById("edit-todo-form");
+    const data = new FormData(form);
+    const todo = Object.fromEntries(data.entries());
+    model.updateTodo(todo, id);
   };
 
   const applyEventListeners = () => {
