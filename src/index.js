@@ -21,7 +21,7 @@ const model = (() => {
   };
 
   const deleteTodo = (id, resetProjectNameList) => {
-    C;
+    const list = JSON.parse(localStorage.getItem("masterList"));
     const newArray = list.filter((todo) => todo.id != id);
     saveListToLocalStorage(newArray);
     view.displayTodos();
@@ -56,6 +56,22 @@ const model = (() => {
     return editButton;
   };
 
+  const createLessInfoButton = (fn) => {
+    const lessInfoButton = document.createElement("button");
+    lessInfoButton.innerHTML = "Less Info";
+    lessInfoButton.classList.add("less-info-button");
+    lessInfoButton.addEventListener("click", fn);
+    return lessInfoButton;
+  };
+
+  const createMoreInfoButton = (fn) => {
+    const moreInfoButton = document.createElement("button");
+    moreInfoButton.innerHTML = "more Info";
+    moreInfoButton.classList.add("more-info-button");
+    moreInfoButton.addEventListener("click", fn);
+    return moreInfoButton;
+  };
+
   return {
     masterList,
     getTodo,
@@ -64,6 +80,8 @@ const model = (() => {
     getProjectNames,
     createEditButton,
     updateTodo,
+    createLessInfoButton,
+    createMoreInfoButton,
   };
 })();
 
@@ -78,19 +96,19 @@ const view = (() => {
   todoList.classList.add("todo-list-ul");
   mainDiv.appendChild(todoList);
 
-  const addDeleteButton = (element) => {
-    const deleteTodoButton = document.createElement("button");
-    deleteTodoButton.classList.add("delete-todo-btn");
-    deleteTodoButton.innerHTML = "X";
-    element.appendChild(deleteTodoButton);
-  };
+  // const addDeleteButton = (element) => {
+  //   const deleteTodoButton = document.createElement("button");
+  //   deleteTodoButton.classList.add("delete-todo-btn");
+  //   deleteTodoButton.innerHTML = "X";
+  //   element.appendChild(deleteTodoButton);
+  // };
 
-  const addMoreInfoButton = (element) => {
-    const moreInfoButton = document.createElement("button");
-    moreInfoButton.classList.add("more-info-btn");
-    moreInfoButton.innerHTML = "More Info";
-    element.appendChild(moreInfoButton);
-  };
+  // const addMoreInfoButton = (element) => {
+  //   const moreInfoButton = document.createElement("button");
+  //   moreInfoButton.classList.add("more-info-btn");
+  //   moreInfoButton.innerHTML = "More Info";
+  //   element.appendChild(moreInfoButton);
+  // };
 
   const addEditButton = (element) => {
     const editTodoButton = document.createElement("button");
@@ -156,17 +174,28 @@ const view = (() => {
     list = JSON.parse(localStorage.getItem("masterList"))
   ) => {
     todoList.innerHTML = "";
-    list.map((todo) => {
-      const newTodoLi = document.createElement("li");
-      const todoDiv = document.createElement("div");
-      todoDiv.classList.add("todo-div");
-      newTodoLi.appendChild(todoDiv);
-      newTodoLi.id = todo.id;
-      addMoreInfoButton(newTodoLi);
-      addDeleteButton(newTodoLi);
-      todoDiv.innerHTML = todo.title;
-      todoList.appendChild(newTodoLi);
-    });
+    list.map(
+      ({ id, title, description, dueDate, priorityLevel, projectName }) => {
+        const newTodoLi = document.createElement("li");
+        newTodoLi.classList.add("todo-li");
+        newTodoLi.id = id;
+        const todoHTML = `
+          <ul class="todo-info-list">
+            <li class="todo-title">${title}</li>
+            <li class="todo-description">${description}</li>
+            <li class="todo-date">${dueDate}</li>
+            <li class="todo-priority">${priorityLevel}</li>
+            <li class="todo-project">${projectName}</li>
+          </ul>
+          <div class="buttons">
+            <button class="more-info-btn">More Info</button>
+            <button class="delete-todo-btn">Delete Todo</button>
+          </div>`;
+
+        newTodoLi.innerHTML = todoHTML;
+        todoList.appendChild(newTodoLi);
+      }
+    );
   };
 
   const displayTodosByProject = (project) => {
@@ -186,12 +215,16 @@ const view = (() => {
     const todoSelected = list.filter((todo) => todo.id === id);
     li.classList.add("display-more-info");
     const descriptionDiv = document.createElement("div");
+    descriptionDiv.classList.add("todo-data-div");
     descriptionDiv.innerHTML = todoSelected[0].description;
     const dueDateDiv = document.createElement("div");
+    dueDateDiv.classList.add("todo-data-div");
     dueDateDiv.innerHTML = todoSelected[0].dueDate;
     const priorityLevelDiv = document.createElement("div");
+    priorityLevelDiv.classList.add("todo-data-div");
     priorityLevelDiv.innerHTML = todoSelected[0].priorityLevel;
     const projectNameDiv = document.createElement("div");
+    projectNameDiv.classList.add("todo-data-div");
     projectNameDiv.innerHTML = todoSelected[0].projectName;
     const editButton = model.createEditButton();
 
@@ -202,11 +235,20 @@ const view = (() => {
     li.appendChild(editButton);
   };
 
+  const displayLessInfo = (li) => {
+    const nodes = li.children;
+    const dataToRemove = document.querySelectorAll(".todo-data-div");
+    console.log(nodes);
+    console.log(dataToRemove);
+    nodes.remove(dataToRemove);
+  };
+
   return {
     displayTodos,
     displayProjectNames,
     displayTodosByProject,
     displayMoreInfo,
+    displayLessInfo,
     editableTodo,
   };
 })();
@@ -252,12 +294,27 @@ const controller = (() => {
   };
 
   const handleMoreInfo = (e) => {
-    const li = e.target.parentElement;
+    const todo = e.target.parentNode;
+    const moreInfoButton = todo.children[1];
+    const lessInfoButton = model.createLessInfoButton(handleLessInfo);
+    todo.removeChild(moreInfoButton);
+    todo.appendChild(lessInfoButton);
+    const li = todo;
     const id = li.id;
     view.displayMoreInfo(id, li);
     const editInfoButton = document.querySelector(".edit-todo-btn");
     editInfoButton.addEventListener("click", handleEditTodo);
     applyEventListeners();
+  };
+
+  const handleLessInfo = (e) => {
+    const parent = e.target.parentNode;
+    view.displayLessInfo(parent);
+    const todo = e.target.parentNode;
+    const lessInfoButton = todo.children[2];
+    const moreInfoButton = model.createMoreInfoButton(handleMoreInfo);
+    todo.removeChild(lessInfoButton);
+    todo.appendChild(moreInfoButton);
   };
 
   const handleEditTodo = (e) => {
