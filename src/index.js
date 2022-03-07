@@ -15,7 +15,6 @@ const model = (() => {
   const addTodoToList = (todo) => {
     const list = JSON.parse(localStorage.getItem("masterList"));
     list.push(todo);
-    console.log(list);
     saveListToLocalStorage(list);
     view.displayTodos();
   };
@@ -28,14 +27,18 @@ const model = (() => {
     resetProjectNameList();
   };
 
-  const updateTodo = (updatedTodo, id, viewFn) => {
+  const updateTodo = (updatedTodo, id, viewFn, projectNamesFn) => {
     const list = JSON.parse(localStorage.getItem("masterList"));
     let indexOfTodo = list.findIndex((todo) => todo.id === id);
-    console.log(updatedTodo);
-    console.log(list[indexOfTodo]);
+    // console.log(updatedTodo);
+    // console.log(list[indexOfTodo]);
     list[indexOfTodo] = updatedTodo;
     saveListToLocalStorage(list);
     viewFn();
+    console.log(list);
+    const projectNames = getProjectNames(list);
+    console.log(projectNames);
+    // projectNamesFn(projectNames);
   };
 
   const saveListToLocalStorage = (list) => {
@@ -160,7 +163,9 @@ const view = (() => {
 
   const displayProjectNames = (list) => {
     projectListUl.innerHTML = "";
-    list.map((li) => projectListUl.appendChild(li));
+    list.map((li) => {
+      projectListUl.appendChild(li);
+    });
   };
 
   const displayTodos = (
@@ -320,7 +325,7 @@ const controller = (() => {
     const data = new FormData(form);
     const todo = Object.fromEntries(data.entries());
     todo.id = id;
-    model.updateTodo(todo, id, view.displayTodos);
+    model.updateTodo(todo, id, view.displayTodos, view.displayProjectNames);
   };
 
   const applyEventListeners = () => {
