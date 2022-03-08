@@ -229,8 +229,6 @@ const view = (() => {
   const displayLessInfo = (li) => {
     const nodes = li.children;
     const dataToRemove = document.querySelectorAll(".todo-data-div");
-    console.log(nodes);
-    console.log(dataToRemove);
     nodes.remove(dataToRemove);
   };
 
@@ -296,7 +294,9 @@ const controller = (() => {
   const handleLessInfo = (e) => {
     const todoButtonsDiv = e.target.parentElement;
     const lessInfoButton = todoButtonsDiv.children[0];
+    const editButton = todoButtonsDiv.children[2];
     todoButtonsDiv.removeChild(lessInfoButton);
+    todoButtonsDiv.removeChild(editButton);
     const moreInfoButton = model.createMoreInfoButton(handleMoreInfo);
     todoButtonsDiv.prepend(moreInfoButton);
     const todoData = todoButtonsDiv.parentElement.children[0].children;
